@@ -11,7 +11,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { MulterField } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 
-import { ENV } from '@/shared/enums';
+import { ENV } from '../../../shared/enums';
 
 import { ImageDiffService } from './image-diff.service';
 

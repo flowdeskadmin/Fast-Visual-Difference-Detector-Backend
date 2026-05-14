@@ -10,11 +10,6 @@
     "sourceMap": true,
     "outDir": "./build",
     "baseUrl": "./",
-    "paths": {
-      "@/shared/*": ["./src/shared/*"],
-      "@/core/*": ["./src/core/*"],
-      "@/*": ["./src/web/*"]
-    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,

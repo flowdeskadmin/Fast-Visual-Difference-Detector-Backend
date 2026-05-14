@@ -1,4 +1,4 @@
-import { APP_ENV, ENV } from '@/shared/enums';
+import { APP_ENV, ENV } from '../enums';
 
 import { transformToInt } from '../helpers';
 

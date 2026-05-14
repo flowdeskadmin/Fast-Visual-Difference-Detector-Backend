@@ -1,7 +1,7 @@
 import { Global, Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { Configuration } from '@/shared/config';
+import { Configuration } from '../shared/config';
 
 /**
  * Trimmed-down CoreModule for the image-diff app.

@@ -2,9 +2,9 @@ import { Logger, MiddlewareConsumer, Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
-import { CoreModule } from '@/core/core.module';
-import { HealthcheckModule } from '@/core/healthcheck/healthcheck.module';
-import { RequestLoggerMiddleware } from '@/shared/middlewares';
+import { CoreModule } from '../core/core.module';
+import { HealthcheckModule } from '../core/healthcheck/healthcheck.module';
+import { RequestLoggerMiddleware } from '../shared/middlewares';
 
 import { FeaturesModule } from './features/features.module';
 

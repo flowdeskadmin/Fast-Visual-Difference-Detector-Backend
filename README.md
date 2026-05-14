@@ -126,14 +126,67 @@ Steps:
 6. Smoke test: `curl https://<your-domain>/api/healthcheck` should
    return `{"message":"Ok"}`.
 
+### Deploying to Vercel
+
+NestJS also runs fine as a Vercel serverless function via the small
+adapter at `api/index.ts`. The adapter is the **only** Vercel-specific
+TypeScript file — it doesn't even import `@vercel/node`. It uses plain
+Node `http` types and forwards every request into the same Express
+instance that `npm run prod` would have started.
+
+Both deploy paths (Railway and Vercel) share the bootstrap logic in
+`src/bootstrap.ts`, so CORS / body limits / global pipes can never
+drift between them.
+
+Steps:
+
+1. Push this repo to GitHub.
+2. On <https://vercel.com>, **Add New → Project → Import** this repo.
+3. Vercel reads `vercel.json`:
+   - All `/api/*` traffic → the serverless function at `api/index.ts`.
+   - `/` → the static landing page at `public/index.html`.
+   - Function memory: **1024 MB** (recommended — sharp's libvips
+     decoder uses ~50 MB on common screenshots).
+   - Function timeout: **30 s**.
+4. Under **Environment Variables**, set:
+   - `CORS_ORIGIN` → your frontend's production URL,
+     comma-separated for multiples. Any `*.vercel.app` host is allowed
+     automatically.
+   - Optional: `MAX_IMAGE_BYTES`, `BODY_SIZE` (see caveat below).
+5. Deploy. The assigned URL will be
+   `https://<project>.vercel.app`. Smoke test:
+   `curl https://<your-domain>/api/healthcheck`.
+
+**⚠️ Important Vercel-specific caveats:**
+
+- **Body size cap:** Vercel Hobby and Pro both cap request bodies at
+  **4.5 MB**. Two large screenshots will be rejected by the platform
+  *before* reaching your function. The frontend's Browser engine
+  side-steps this entirely (the diff runs in the user's browser), so
+  the recommended pattern is "use Browser by default, Server only
+  for cases that fit". Enterprise plans raise the cap to 100 MB+.
+- **Function size cap:** Vercel limits compressed function size to
+  **50 MB**. `sharp` + libvips is ~30 MB, so we're well under, but if
+  you add more native dependencies, monitor this.
+- **Cold starts:** the first request after idle takes ~300–500 ms to
+  boot NestJS. We cache the Express instance globally so warm
+  requests are fast.
+- **No Swagger on Vercel:** Swagger setup is intentionally skipped on
+  the serverless path to keep cold starts quick. The
+  `https://<your-domain>/api-docs` endpoint isn't available there.
+  Run the local server (`npm run dev`) for Swagger access.
+
 ### Deploying anywhere else
 
 `npm run build && npm run prod` is the entire production lifecycle.
 Anything that runs Node ≥ 20 and lets you set env vars will work:
 Render, fly.io, AWS ECS, plain `pm2`, a Docker container, etc. The app
 binds to `0.0.0.0:$PORT` so it works inside any reverse-proxied
-container. There are **no platform-specific files in `src/`** — `railway.json`
-is purely declarative config that can be deleted or ignored.
+container.
+
+**No platform-specific files exist in `src/`.** Both `railway.json` and
+`vercel.json` are pure declarative deploy config — delete either (or
+both) freely if you're going somewhere else.
 
 ---
 
@@ -342,8 +395,9 @@ computer-vision steps described in §2.
 
 ```text
 src/
-├── web.ts                              # Bootstrap (CORS, Swagger, /api prefix)
-├── swagger.ts                          # Swagger UI setup
+├── web.ts                              # Standalone entry (Railway, Render, Docker, local dev)
+├── bootstrap.ts                        # Shared NestJS configuration (CORS, pipes, body limits)
+├── swagger.ts                          # Swagger UI setup (long-running server only)
 ├── core/
 │   ├── core.module.ts                  # Slim global module (config + logger)
 │   └── healthcheck/                    # GET /api/healthcheck
@@ -363,6 +417,9 @@ src/
             ├── image-diff.service.ts     # sharp decode + padding
             ├── image-diff.algorithm.ts   # Pure diff pipeline
             └── image-diff.module.ts
+api/
+└── index.ts                            # Vercel serverless adapter
+                                        # (uses ../src/bootstrap.ts)
 test/
 ├── app.e2e-spec.ts                     # Boot + healthcheck e2e
 ├── smoke-diff.mjs                      # End-to-end script (sharp + fetch)
@@ -370,8 +427,9 @@ test/
 └── jest-e2e.json                       # e2e config
 public/
 └── index.html                          # Friendly landing page at /
-railway.json                            # Declarative Railway deploy config
-                                        # (optional - delete if you deploy elsewhere)
+railway.json                            # Railway deploy config (optional)
+vercel.json                             # Vercel deploy config (optional)
+.vercelignore                           # Files Vercel should skip when deploying
 ```
 
 ## Scripts
