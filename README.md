@@ -40,7 +40,7 @@ changes. Once up:
 
 ```bash
 npm run build        # nest build → build/
-npm run prod         # node build/web
+npm run prod         # node build/main
 ```
 
 ### Quick smoke test
@@ -142,18 +142,26 @@ Steps:
 
 1. Push this repo to GitHub.
 2. On <https://vercel.com>, **Add New → Project → Import** this repo.
-3. Vercel reads `vercel.json`:
+3. **Important — set Framework Preset to "Other".** Vercel's "NestJS"
+   preset assumes a long-running server and will fail with
+   `No entrypoint found` because it looks for files in shapes that
+   don't match a serverless adapter. Our `api/index.ts` + `vercel.json`
+   already handles everything explicitly, so the right preset is
+   **Other**.
+4. Vercel reads `vercel.json`:
+   - `"framework": null` — belt-and-suspenders override against
+     auto-detection.
    - All `/api/*` traffic → the serverless function at `api/index.ts`.
    - `/` → the static landing page at `public/index.html`.
    - Function memory: **1024 MB** (recommended — sharp's libvips
      decoder uses ~50 MB on common screenshots).
    - Function timeout: **30 s**.
-4. Under **Environment Variables**, set:
+5. Under **Environment Variables**, set:
    - `CORS_ORIGIN` → your frontend's production URL,
      comma-separated for multiples. Any `*.vercel.app` host is allowed
      automatically.
    - Optional: `MAX_IMAGE_BYTES`, `BODY_SIZE` (see caveat below).
-5. Deploy. The assigned URL will be
+6. Deploy. The assigned URL will be
    `https://<project>.vercel.app`. Smoke test:
    `curl https://<your-domain>/api/healthcheck`.
 
@@ -395,7 +403,7 @@ computer-vision steps described in §2.
 
 ```text
 src/
-├── web.ts                              # Standalone entry (Railway, Render, Docker, local dev)
+├── main.ts                             # Standalone entry (Railway, Render, Docker, local dev)
 ├── bootstrap.ts                        # Shared NestJS configuration (CORS, pipes, body limits)
 ├── swagger.ts                          # Swagger UI setup (long-running server only)
 ├── core/
@@ -439,7 +447,7 @@ vercel.json                             # Vercel deploy config (optional)
 | `npm run dev`       | `nest start --watch` on `http://localhost:8000`         |
 | `npm run start`     | One-shot start (no watch)                               |
 | `npm run build`     | `nest build` → `build/`                                 |
-| `npm run prod`      | `node build/web` (production entrypoint)                |
+| `npm run prod`      | `node build/main` (production entrypoint)               |
 | `npm run lint`      | ESLint                                                  |
 | `npm run test`      | Jest unit tests                                         |
 | `npm run test:e2e`  | Jest e2e (`test/app.e2e-spec.ts`)                       |
