@@ -6,6 +6,7 @@ import { json, urlencoded } from 'express';
 
 import { ENV } from './shared/enums';
 import { AllExceptionFilter } from './shared/filters';
+import { setupSwagger } from './swagger';
 import { WebModule } from './web/web.module';
 
 /**
@@ -24,11 +25,11 @@ import { WebModule } from './web/web.module';
  *
  * Keeping the configuration in one place avoids subtle drift between
  * deployment targets — same CORS rules, same body-parser limits, same
- * global pipe and filter.
+ * global pipe and filter, same Swagger UI.
  *
- * Swagger setup is intentionally **not** here: it's heavyweight and
- * only useful for the long-running server. The Vercel handler should
- * stay slim so cold starts are quick.
+ * Cold-start note: Swagger adds roughly 100 ms to a Vercel cold boot.
+ * That's a small price for having the live Swagger UI available against
+ * the deployed API, which is useful for QA / sharing.
  */
 export async function buildApp(adapter?: ExpressAdapter): Promise<INestApplication> {
   const app = adapter
@@ -80,6 +81,11 @@ export async function buildApp(adapter?: ExpressAdapter): Promise<INestApplicati
       callback(new Error(`Not allowed by CORS (${origin})`));
     },
   });
+
+  // Mount Swagger UI at the configured path (defaults to `/api-docs`).
+  // Has to come after `setGlobalPrefix` so the document picks up the
+  // /api prefix on each operation.
+  setupSwagger(app);
 
   return app;
 }

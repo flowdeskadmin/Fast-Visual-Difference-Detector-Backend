@@ -176,13 +176,11 @@ Steps:
 - **Function size cap:** Vercel limits compressed function size to
   **50 MB**. `sharp` + libvips is ~30 MB, so we're well under, but if
   you add more native dependencies, monitor this.
-- **Cold starts:** the first request after idle takes ~300–500 ms to
-  boot NestJS. We cache the Express instance globally so warm
-  requests are fast.
-- **No Swagger on Vercel:** Swagger setup is intentionally skipped on
-  the serverless path to keep cold starts quick. The
-  `https://<your-domain>/api-docs` endpoint isn't available there.
-  Run the local server (`npm run dev`) for Swagger access.
+- **Cold starts:** the first request after idle takes ~400–600 ms to
+  boot NestJS + mount Swagger. We cache the Express instance globally
+  so warm requests are fast.
+- **Swagger is available on Vercel** at `https://<your-domain>/api-docs`
+  (same path as local dev). The OpenAPI JSON is at `/api-docs-json`.
 
 ### Deploying anywhere else
 
@@ -404,8 +402,8 @@ computer-vision steps described in §2.
 ```text
 src/
 ├── main.ts                             # Standalone entry (Railway, Render, Docker, local dev)
-├── bootstrap.ts                        # Shared NestJS configuration (CORS, pipes, body limits)
-├── swagger.ts                          # Swagger UI setup (long-running server only)
+├── bootstrap.ts                        # Shared NestJS config (CORS, pipes, body limits, Swagger)
+├── swagger.ts                          # Swagger UI helper called from bootstrap.ts
 ├── core/
 │   ├── core.module.ts                  # Slim global module (config + logger)
 │   └── healthcheck/                    # GET /api/healthcheck

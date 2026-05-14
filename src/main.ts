@@ -4,7 +4,6 @@ import 'reflect-metadata';
 
 import { buildApp } from './bootstrap';
 import { ENV } from './shared/enums';
-import { setupSwagger } from './swagger';
 
 /**
  * Standalone entry point.
@@ -13,16 +12,14 @@ import { setupSwagger } from './swagger';
  * (`node build/main`). The same build is what Railway / Render / fly.io
  * / Docker / a plain VPS will run.
  *
- * The Vercel deploy goes through `api/index.ts` instead, which calls
- * `buildApp()` but skips the parts that don't make sense in a
- * serverless context (Swagger UI, explicit listen).
+ * The Vercel deploy goes through `api/index.ts` instead. Both entry
+ * points call the shared `buildApp()` helper so global pipes, body
+ * parsers, CORS, and Swagger are identical across environments.
  */
 async function main() {
   const app = await buildApp();
   const configService = app.get(ConfigService);
   const logger = app.get(Logger);
-
-  setupSwagger(app);
 
   const port = configService.get<number>(ENV.APP_PORT);
   // Bind to 0.0.0.0 so managed hosts (Railway, Render, fly, Docker, etc.)
