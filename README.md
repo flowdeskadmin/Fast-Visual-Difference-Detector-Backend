@@ -181,6 +181,11 @@ Steps:
   so warm requests are fast.
 - **Swagger is available on Vercel** at `https://<your-domain>/api-docs`
   (same path as local dev). The OpenAPI JSON is at `/api-docs-json`.
+  Note: `vercel.json` has `"includeFiles": "node_modules/swagger-ui-dist/**"`
+  on the function — without it, Vercel's bundler doesn't trace
+  Swagger UI's static JS/CSS into the function bundle and the UI page
+  fails to load with `SwaggerUIBundle is not defined`. Don't remove
+  that line unless you're prepared to disable Swagger.
 
 ### Deploying anywhere else
 
