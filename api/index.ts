@@ -9,14 +9,14 @@
  *   - This file is the *only* Vercel-specific piece of code. Delete the
  *     `api/` folder and `vercel.json` and the project deploys to
  *     Railway / Render / fly.io / Docker / a plain VPS unchanged via
- *     `npm run prod` (which uses `src/web.ts`).
+ *     `npm run prod` (which uses `src/main.ts`).
  *   - We use plain Node `http` types so there's no `@vercel/node`
  *     dependency. Vercel's runtime provides Express-compatible
  *     `req`/`res` objects at runtime; the small cast below is safe
  *     because Express only reads the subset of fields that
  *     `IncomingMessage`/`ServerResponse` guarantee.
  *   - The slim `buildApp()` from `../src/bootstrap.ts` is shared with
- *     `src/web.ts` so CORS / body limits / global pipes can never drift
+ *     `src/main.ts` so CORS / body limits / global pipes can never drift
  *     between the two deploy paths.
  */
 

@@ -10,7 +10,7 @@ import { setupSwagger } from './swagger';
  * Standalone entry point.
  *
  * Used by `npm run dev` (watch mode) and `npm run prod`
- * (`node build/web`). The same build is what Railway / Render / fly.io
+ * (`node build/main`). The same build is what Railway / Render / fly.io
  * / Docker / a plain VPS will run.
  *
  * The Vercel deploy goes through `api/index.ts` instead, which calls

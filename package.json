@@ -15,7 +15,7 @@
     "start": "nest start",
     "dev": "nest start --watch",
     "debug": "nest start --debug --watch",
-    "prod": "node build/web",
+    "prod": "node build/main",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "test": "jest --config ./test/jest.json --forceExit",
     "test:e2e": "jest --config ./test/jest-e2e.json --forceExit",

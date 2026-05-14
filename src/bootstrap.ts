@@ -13,7 +13,7 @@ import { WebModule } from './web/web.module';
  *
  * Both entry points use this:
  *
- *   - `src/web.ts`         — standard long-running Node process. Used by
+ *   - `src/main.ts`        — standard long-running Node process. Used by
  *                            `npm run dev`, `npm run prod`, Railway,
  *                            Render, Docker, anything else that accepts a
  *                            normal server.

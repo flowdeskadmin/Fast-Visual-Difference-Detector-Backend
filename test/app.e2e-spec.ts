@@ -2,7 +2,7 @@ import { type INestApplication } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 
-import { WebModule } from '@/web.module';
+import { WebModule } from '../src/web/web.module';
 
 jest.setTimeout(30000);
 
